@@ -57,7 +57,7 @@ const faqs = [
 <Layout title="Creative Insights - Antigravity Blog" description="Explore the forefront of design, artificial intelligence, and marketing.">
   
   {/* ======================= Hero START ======================= */}
-  <section class="relative bg-card pt-28 pb-20 border-b border-border overflow-hidden">
+  <section class="relative bg-card pt-36 sm:pt-40 lg:pt-48 pb-32 border-b border-border overflow-hidden">
     {/* Ambient light glow */}
     <div class="absolute -top-40 -left-40 w-96 h-96 bg-primary/10 rounded-full blur-[120px]"></div>
 
@@ -93,7 +93,7 @@ const faqs = [
       </div>
 
       {/* Hero Blog Box (Featured posts side-by-side) */}
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 -mb-32 relative z-25">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 -mb-36 relative z-25">
         {featuredPosts.map(post => {
           const postAuthor = authorMap.get(post.data.author.id);
           const postCategory = categoryMap.get(post.data.category.id);
@@ -139,7 +139,7 @@ const faqs = [
   {/* ======================= Hero END ======================= */}
 
   {/* ======================= Blog List and Sidebar START ======================= */}
-  <section class="pt-40 pb-20">
+  <section class="pt-48 pb-20">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
         {/* Left Column: Highlights list */}
