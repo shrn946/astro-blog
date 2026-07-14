@@ -3,6 +3,7 @@ import Layout from '../layouts/Layout.astro';
 import { getCollection } from 'astro:content';
 import { getActivePosts } from '../utils/blog';
 import { Cpu, ArrowRight, BookOpen, Layers, MessageSquare, Terminal, ChevronRight, HelpCircle, Star } from 'lucide-react';
+import FAQAccordion from '../components/FAQAccordion';
 
 // Fetch all posts, filter drafts, sort by date
 const posts = await getActivePosts();
@@ -186,14 +187,14 @@ const faqs = [
 
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {latestPosts.map(post => (
-          <article class="flex flex-col rounded-2xl glass border border-white/5 overflow-hidden hover:scale-[1.01] hover:border-purple-500/20 transition-all flex-grow">
+          <article class="flex flex-col rounded-2xl glass border border-border overflow-hidden hover:scale-[1.03] hover:border-primary/40 hover:shadow-2xl hover:shadow-primary/5 transition-all duration-300 flex-grow group">
             <a href={`/blog/${post.id}`} class="block h-48 overflow-hidden relative">
               <img 
                 src={post.data.featuredImage} 
                 alt={post.data.title}
-                class="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               />
-              <span class="absolute top-3 left-3 px-2 py-0.5 rounded-md bg-black/60 text-purple-400 text-[10px] font-bold tracking-wider uppercase border border-white/10">
+              <span class="absolute top-3 left-3 px-2 py-0.5 rounded-md bg-black/60 text-primary text-[10px] font-bold tracking-wider uppercase border border-white/10">
                 {post.data.category.id}
               </span>
             </a>
@@ -203,16 +204,16 @@ const faqs = [
                 <span>•</span>
                 <span>{post.data.readingTime || '5 min read'}</span>
               </div>
-              <h3 class="text-lg font-bold line-clamp-2 hover:text-purple-400 transition-colors mb-3">
+              <h3 class="text-lg font-bold line-clamp-2 hover:text-primary transition-colors mb-3">
                 <a href={`/blog/${post.id}`}>{post.data.title}</a>
               </h3>
               <p class="text-sm text-gray-400 line-clamp-3 mb-4 leading-relaxed">
                 {post.data.description}
               </p>
               <div class="mt-auto pt-4 border-t border-white/5 flex items-center justify-between">
-                <span class="text-xs text-purple-400 font-semibold">{post.data.difficulty}</span>
+                <span class="text-xs text-primary font-semibold">{post.data.difficulty}</span>
                 <a href={`/blog/${post.id}`} class="text-xs font-bold text-gray-300 hover:text-white flex items-center gap-1 transition-colors">
-                  Read <ArrowRight class="w-3.5 h-3.5" />
+                  Read <ArrowRight class="w-3.5 h-3.5 group-hover:translate-x-1.5 transition-transform duration-300" />
                 </a>
               </div>
             </div>
@@ -253,23 +254,12 @@ const faqs = [
   <section class="py-16 bg-black/10 border-t border-white/5">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-12">
-        <HelpCircle class="w-10 h-10 mx-auto text-purple-400 mb-3" />
+        <HelpCircle class="w-10 h-10 mx-auto text-primary mb-3 animate-pulse" />
         <h2 class="text-2xl sm:text-3xl font-bold">Frequently Asked Questions</h2>
         <p class="text-sm text-gray-500 mt-1">Get instant answers on our static architectural decisions.</p>
       </div>
 
-      <div class="space-y-4">
-        {faqs.map((faq, idx) => (
-          <div class="rounded-2xl glass border border-white/5 p-6 space-y-2">
-            <h4 class="font-bold text-base text-gray-100 flex items-start gap-2">
-              <span class="text-purple-400">Q:</span> {faq.question}
-            </h4>
-            <p class="text-sm text-gray-400 pl-6 leading-relaxed">
-              {faq.answer}
-            </p>
-          </div>
-        ))}
-      </div>
+      <FAQAccordion client:visible items={faqs} />
     </div>
   </section>
 

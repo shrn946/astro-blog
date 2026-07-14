@@ -3,6 +3,7 @@ import Layout from '../../layouts/Layout.astro';
 import { getCollection, getEntry, render } from 'astro:content';
 import { getActivePosts, getRelatedPosts } from '../../utils/blog';
 import { ChevronRight, Home, Calendar, Clock, User, Share2, Link, ArrowLeft, ArrowRight, ArrowUp, MessageSquare } from 'lucide-react';
+import FAQAccordion from '../../components/FAQAccordion';
 
 export async function getStaticPaths() {
   const posts = await getCollection('blog');
@@ -188,16 +189,9 @@ const articleUrl = `${siteUrl}/blog/${post.slug || post.id}`;
 
         {/* FAQs inside Post */}
         {post.data.faq && post.data.faq.length > 0 && (
-          <div class="p-6 rounded-2xl glass border border-white/5 space-y-4">
-            <h3 class="text-xl font-bold text-white flex items-center gap-2">FAQ</h3>
-            <div class="space-y-4">
-              {post.data.faq.map(f => (
-                <div class="space-y-1">
-                  <h4 class="font-semibold text-sm text-purple-400">Q: {f.question}</h4>
-                  <p class="text-xs text-gray-400 leading-relaxed">{f.answer}</p>
-                </div>
-              ))}
-            </div>
+          <div class="space-y-6">
+            <h3 class="text-xl font-bold text-white flex items-center gap-2">Article FAQ</h3>
+            <FAQAccordion client:visible items={post.data.faq} />
           </div>
         )}
 
