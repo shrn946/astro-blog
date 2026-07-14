@@ -14,7 +14,7 @@ tags:
   - Frontend
 featured: true
 draft: false
-featuredImage: /images/blog/react-guide.jpg
+featuredImage: /assets/images/blog/4by3/04.jpg
 featuredImageAlt: Abstract reactor core representing the React atomic symbol.
 canonical: https://astro-premium-blog.vercel.app/blog/react-guide
 robots: index, follow

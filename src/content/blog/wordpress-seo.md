@@ -13,7 +13,7 @@ tags:
   - AI
 featured: false
 draft: false
-featuredImage: /images/blog/wordpress-seo.jpg
+featuredImage: /assets/images/blog/4by4/01.jpg
 featuredImageAlt: A WordPress logo morphing into search graphs and AI networks.
 canonical: https://astro-premium-blog.vercel.app/blog/wordpress-seo
 robots: index, follow

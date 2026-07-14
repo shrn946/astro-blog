@@ -14,7 +14,7 @@ tags:
   - Productivity
 featured: true
 draft: false
-featuredImage: /images/blog/best-ai-tools.jpg
+featuredImage: /assets/images/blog/4by3/03.jpg
 featuredImageAlt: A futuristic workspace with glowing hologram screens and neural net visualizations.
 canonical: https://astro-premium-blog.vercel.app/blog/best-ai-tools
 robots: index, follow

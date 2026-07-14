@@ -13,7 +13,7 @@ tags:
   - Responsive
 featured: false
 draft: false
-featuredImage: /images/blog/css-tricks.jpg
+featuredImage: /assets/images/blog/4by4/02.jpg
 featuredImageAlt: Beautiful abstract waves of color blending seamlessly, representing CSS styling.
 canonical: https://astro-premium-blog.vercel.app/blog/css-tricks
 robots: index, follow

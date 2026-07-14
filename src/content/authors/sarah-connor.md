@@ -1,6 +1,6 @@
 ---
 name: Sarah Connor
-photo: /images/authors/sarah-connor.jpg
+photo: /assets/images/team/01.jpg
 bio: Senior AI Research Engineer and Developer Advocate. Sarah specializes in generative AI, neural networks, and agentic workflows.
 website: https://sarahconnor.ai
 twitter: https://twitter.com/sarahconnor

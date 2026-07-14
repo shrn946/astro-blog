@@ -9,7 +9,7 @@ tags:
   - Draft
 featured: false
 draft: true
-featuredImage: /images/blog/draft-post.jpg
+featuredImage: /assets/images/blog/4by4/03.jpg
 featuredImageAlt: A draft envelope.
 ---
 
