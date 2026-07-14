@@ -1,0 +1,198 @@
+---
+import '../styles/global.css';
+import { SEO } from 'astro-seo';
+import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
+
+interface Props {
+  title: string;
+  description?: string;
+  image?: string;
+  canonical?: string;
+  robots?: string;
+  authorName?: string;
+  publishDate?: Date;
+  updatedDate?: Date;
+  tags?: string[];
+  type?: 'website' | 'article';
+}
+
+const {
+  title,
+  description = 'An enterprise-quality Astro blog with React and Tailwind CSS.',
+  image = '/images/og-default.jpg',
+  canonical,
+  robots = 'index, follow',
+  authorName,
+  publishDate,
+  updatedDate,
+  tags = [],
+  type = 'website',
+} = Astro.props;
+
+const siteUrl = Astro.site || 'https://astro-premium-blog.vercel.app';
+const absoluteImageUrl = new URL(image, siteUrl).toString();
+const currentUrl = new URL(Astro.url.pathname, siteUrl).toString();
+
+// Generate structured data schemas
+const websiteSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  'name': 'Antigravity.AI',
+  'url': siteUrl,
+  'description': description,
+};
+
+const organizationSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  'name': 'Antigravity.AI',
+  'url': siteUrl,
+  'logo': `${siteUrl}/images/favicon.png`,
+};
+
+const articleSchema = type === 'article' && publishDate ? {
+  '@context': 'https://schema.org',
+  '@type': 'NewsArticle',
+  'headline': title,
+  'image': [absoluteImageUrl],
+  'datePublished': publishDate.toISOString(),
+  'dateModified': (updatedDate || publishDate).toISOString(),
+  'author': [{
+    '@type': 'Person',
+    'name': authorName || 'Staff Writer',
+    'url': `${siteUrl}/blog`
+  }]
+} : null;
+---
+
+<!DOCTYPE html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+
+    {/* Load Google Fonts */}
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet" />
+
+    {/* Enforce Dark Theme */}
+    <script is:inline>
+      document.documentElement.classList.add('dark');
+      document.documentElement.classList.remove('light');
+    </script>
+
+    {/* Astro SEO component */}
+    <SEO
+      title={title}
+      description={description}
+      canonical={canonical || currentUrl}
+      openGraph={{
+        basic: {
+          title: title,
+          type: type,
+          image: absoluteImageUrl,
+          url: canonical || currentUrl,
+        },
+        image: {
+          alt: title,
+        },
+        article: type === 'article' ? {
+          publishedTime: publishDate?.toISOString(),
+          modifiedTime: (updatedDate || publishDate)?.toISOString(),
+          authors: authorName ? [authorName] : [],
+          tags: tags,
+        } : undefined
+      }}
+      twitter={{
+        card: 'summary_large_image',
+        site: '@antigravity_ai',
+        creator: '@antigravity_ai',
+        title: title,
+        description: description,
+        image: absoluteImageUrl,
+      }}
+      extend={{
+        meta: [
+          { name: 'robots', content: robots },
+          { name: 'keywords', content: tags.join(', ') },
+        ]
+      }}
+    />
+
+    {/* Inline JSON-LD schemas */}
+    <script type="application/ld+json" set:html={JSON.stringify(websiteSchema)} />
+    <script type="application/ld+json" set:html={JSON.stringify(organizationSchema)} />
+    {articleSchema && <script type="application/ld+json" set:html={JSON.stringify(articleSchema)} />}
+
+    {/* Google Analytics Placeholder */}
+    <script is:inline src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX" async></script>
+    <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-XXXXXXXXXX');
+    </script>
+  </head>
+  <body class="bg-background text-foreground min-h-screen flex flex-col antialiased">
+    
+    {/* Navigation */}
+    <Navbar client:load />
+
+    {/* Above Hero Ad placement */}
+    <div className="w-full max-w-7xl mx-auto px-4 mt-24 flex items-center justify-center min-h-[90px] border-b border-white/5 bg-black/20">
+      <div className="text-center text-[10px] text-gray-500 tracking-wider py-2">
+        <p>ADVERTISEMENT</p>
+        <div className="text-[11px] text-gray-400">Responsive AdSense Leaderboard (Header)</div>
+      </div>
+    </div>
+
+    {/* Main Content */}
+    <main class="flex-grow">
+      <slot />
+    </main>
+
+    {/* Footer */}
+    <Footer client:visible />
+
+    {/* Cookie Consent Banner */}
+    <div id="cookie-banner" class="fixed bottom-6 right-6 max-w-sm p-5 rounded-2xl glass border border-white/10 shadow-2xl z-50 transform translate-y-20 opacity-0 transition-all duration-500 flex flex-col gap-3">
+      <p class="text-xs text-gray-300 leading-relaxed">
+        We use cookies to analyze traffic, customize your experience, and serve personalized ads. By using this website, you agree to our policies.
+      </p>
+      <div class="flex gap-2">
+        <button id="accept-cookies" class="flex-1 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-700 text-xs font-bold text-white transition-colors">
+          Accept
+        </button>
+        <button id="decline-cookies" class="flex-1 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-xs font-bold text-gray-300 transition-colors">
+          Decline
+        </button>
+      </div>
+    </div>
+
+    <script is:inline>
+      const banner = document.getElementById('cookie-banner');
+      const acceptBtn = document.getElementById('accept-cookies');
+      const declineBtn = document.getElementById('decline-cookies');
+      
+      const consent = localStorage.getItem('cookie-consent');
+      if (!consent) {
+        setTimeout(() => {
+          banner?.classList.remove('translate-y-20', 'opacity-0');
+        }, 1500);
+      }
+
+      acceptBtn?.addEventListener('click', () => {
+        localStorage.setItem('cookie-consent', 'accepted');
+        banner?.classList.add('translate-y-20', 'opacity-0');
+      });
+
+      declineBtn?.addEventListener('click', () => {
+        localStorage.setItem('cookie-consent', 'declined');
+        banner?.classList.add('translate-y-20', 'opacity-0');
+      });
+    </script>
+  </body>
+</html>

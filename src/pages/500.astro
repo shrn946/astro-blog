@@ -1,0 +1,47 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { Home, RefreshCw, AlertTriangle } from 'lucide-react';
+
+interface Props {
+  error: unknown;
+}
+
+const { error } = Astro.props;
+const errorMessage = error instanceof Error ? error.message : 'Unknown Server Error';
+---
+
+<Layout title="500 - Internal Server Error" description="An unexpected error occurred on the server.">
+  <div class="max-w-xl mx-auto px-4 py-24 text-center space-y-6">
+    <div class="inline-flex items-center justify-center p-6 rounded-full bg-yellow-500/10 text-yellow-400 mb-4 animate-pulse">
+      <AlertTriangle class="w-16 h-16" />
+    </div>
+    
+    <h1 class="text-4xl font-extrabold tracking-tight sm:text-5xl text-white">
+      500 - Server Error
+    </h1>
+    
+    <p class="text-base text-gray-400 max-w-sm mx-auto leading-relaxed">
+      Something went wrong on our end. We are investigating the issue. Please try refreshing or returning home.
+    </p>
+
+    <div class="p-4 rounded-xl bg-black/40 border border-white/5 text-left font-mono text-xs text-red-400 max-w-md mx-auto overflow-x-auto">
+      <p class="font-semibold mb-1">Details:</p>
+      <pre class="bg-transparent border-0 p-0 text-red-300 whitespace-pre-wrap">{errorMessage}</pre>
+    </div>
+
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-3 pt-6">
+      <a 
+        href="/" 
+        class="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-sm transition-colors shadow-lg shadow-purple-600/20"
+      >
+        <Home class="w-4 h-4 mr-2" /> Back Home
+      </a>
+      <button 
+        onclick="window.location.reload()"
+        class="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 rounded-xl glass hover:bg-white/5 text-gray-300 font-semibold text-sm transition-colors"
+      >
+        <RefreshCw class="w-4 h-4 mr-2" /> Reload Page
+      </button>
+    </div>
+  </div>
+</Layout>

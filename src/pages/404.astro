@@ -1,0 +1,35 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { Home, Search, AlertOctagon } from 'lucide-react';
+---
+
+<Layout title="404 - Page Not Found" description="The page you are looking for does not exist.">
+  <div class="max-w-xl mx-auto px-4 py-24 text-center space-y-6">
+    <div class="inline-flex items-center justify-center p-6 rounded-full bg-red-500/10 text-red-400 mb-4 animate-bounce">
+      <AlertOctagon class="w-16 h-16" />
+    </div>
+    
+    <h1 class="text-4xl font-extrabold tracking-tight sm:text-5xl text-white">
+      404 - Page Not Found
+    </h1>
+    
+    <p class="text-base text-gray-400 max-w-sm mx-auto leading-relaxed">
+      Sorry, we couldn't find the article or page you were looking for. It might have been moved or renamed.
+    </p>
+
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-3 pt-6">
+      <a 
+        href="/" 
+        class="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-sm transition-colors shadow-lg shadow-purple-600/20"
+      >
+        <Home class="w-4 h-4 mr-2" /> Back Home
+      </a>
+      <button 
+        onclick="document.querySelector('[aria-label=\'Open Search\']')?.click()"
+        class="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 rounded-xl glass hover:bg-white/5 text-gray-300 font-semibold text-sm transition-colors"
+      >
+        <Search class="w-4 h-4 mr-2" /> Search Articles
+      </button>
+    </div>
+  </div>
+</Layout>
