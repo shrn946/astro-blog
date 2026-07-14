@@ -78,10 +78,22 @@ const articleSchema = type === 'article' && publishDate ? {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet" />
 
-    {/* Enforce Dark Theme */}
+    {/* Enforce Theme Settings */}
     <script is:inline>
-      document.documentElement.classList.add('dark');
-      document.documentElement.classList.remove('light');
+      const storedTheme = localStorage.getItem('theme');
+      const getPreferredTheme = () => {
+        if (storedTheme) return storedTheme;
+        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      };
+      const setTheme = (theme) => {
+        if (theme === 'auto') {
+          const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          document.documentElement.className = systemDark ? 'dark' : 'light';
+        } else {
+          document.documentElement.className = theme;
+        }
+      };
+      setTheme(getPreferredTheme());
     </script>
 
     {/* Astro SEO component */}

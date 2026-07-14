@@ -1,162 +1,249 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X, Sun, Moon, Search, Cpu, Code, BookOpen, Layers } from 'lucide-react';
-import SearchModal from './SearchModal';
+import { ChevronDown, Moon, Sun, Laptop, Menu, X, Cpu } from 'lucide-react';
+
+type ThemeMode = 'light' | 'dark' | 'auto';
 
 export default function Navbar() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
-  const [scrolled, setScrolled] = useState(false);
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [currentTheme, setCurrentTheme] = useState<ThemeMode>('auto');
+  const [themeDropdownOpen, setThemeDropdownOpen] = useState(false);
 
-  // Initialize theme from localStorage or system preference
+  // Initialize theme from storage
   useEffect(() => {
-    const savedTheme = localStorage.getItem('theme');
-    const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const initialTheme = savedTheme === 'light' ? 'light' : 'dark';
-    
-    setTheme(initialTheme);
-    if (initialTheme === 'dark') {
-      document.documentElement.classList.add('dark');
-      document.documentElement.classList.remove('light');
-    } else {
-      document.documentElement.classList.add('light');
-      document.documentElement.classList.remove('dark');
-    }
+    const stored = (localStorage.getItem('theme') as ThemeMode) || 'auto';
+    setCurrentTheme(stored);
   }, []);
 
-  // Monitor scrolling to add background blur effect
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  const toggleTheme = () => {
-    const nextTheme = theme === 'dark' ? 'light' : 'dark';
-    setTheme(nextTheme);
-    localStorage.setItem('theme', nextTheme);
+  const handleThemeChange = (mode: ThemeMode) => {
+    setCurrentTheme(mode);
+    localStorage.setItem('theme', mode);
+    setThemeDropdownOpen(false);
     
-    if (nextTheme === 'dark') {
-      document.documentElement.classList.add('dark');
-      document.documentElement.classList.remove('light');
+    if (mode === 'auto') {
+      const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      document.documentElement.className = systemDark ? 'dark' : 'light';
     } else {
-      document.documentElement.classList.add('light');
-      document.documentElement.classList.remove('dark');
+      document.documentElement.className = mode;
     }
   };
 
-  const categories = [
-    { title: 'AI', url: '/blog?category=ai', icon: Cpu },
-    { title: 'React', url: '/blog?category=react', icon: Code },
-    { title: 'JavaScript', url: '/blog?category=javascript', icon: Layers },
-    { title: 'CSS', url: '/blog?category=css', icon: BookOpen },
-  ];
+  const toggleDropdown = (name: string) => {
+    setActiveDropdown(activeDropdown === name ? null : name);
+  };
+
+  const closeAllDropdowns = () => {
+    setActiveDropdown(null);
+  };
 
   return (
-    <>
-      <header className={`fixed top-0 left-0 w-full z-40 transition-all duration-300 ${
-        scrolled 
-          ? 'glass py-3 shadow-lg border-b border-black/5 dark:border-white/5' 
-          : 'bg-transparent py-5'
-      }`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between">
-            {/* Logo */}
-            <a href="/" className="flex items-center space-x-2 group">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-600 to-pink-500 flex items-center justify-center shadow-lg shadow-purple-500/20 group-hover:scale-105 transition-transform">
-                <Cpu className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 transition-colors">
-                ANTIGRAVITY<span className="text-purple-500">.AI</span>
-              </span>
-            </a>
+    <header className="fixed top-0 left-0 w-full z-40 bg-background/80 backdrop-blur-md border-b border-border py-4">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between">
+          
+          {/* Logo */}
+          <a href="/" className="flex items-center space-x-2 group">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-primary to-purple-500 flex items-center justify-center shadow-lg shadow-primary/20 group-hover:scale-105 transition-transform">
+              <Cpu className="w-5 h-5 text-white" />
+            </div>
+            <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-foreground to-gray-400 dark:from-white dark:to-gray-300 transition-colors">
+              ANTIGRAVITY<span className="text-primary">.AI</span>
+            </span>
+          </a>
 
-            {/* Desktop Navigation Links */}
-            <nav className="hidden md:flex items-center space-x-8">
-              <a href="/" className="text-sm font-medium hover:text-purple-400 transition-colors">Home</a>
-              <a href="/blog" className="text-sm font-medium hover:text-purple-400 transition-colors">Articles</a>
-              
-              {/* Categories Mega Menu Trigger */}
-              <div className="relative group">
-                <button className="flex items-center text-sm font-medium hover:text-purple-400 transition-colors gap-1">
-                  Topics
-                  <svg className="w-4 h-4 transition-transform group-hover:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </button>
-                {/* Mega Menu Dropdown */}
-                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-3 w-80 p-4 rounded-2xl glass border border-black/10 dark:border-white/10 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 shadow-2xl">
-                  <div className="grid grid-cols-2 gap-3">
-                    {categories.map(cat => {
-                      const Icon = cat.icon;
-                      return (
-                        <a key={cat.title} href={cat.url} className="flex flex-col p-3 rounded-xl hover:bg-white/5 border border-transparent hover:border-white/5 transition-all">
-                          <Icon className="w-5 h-5 text-purple-400 mb-2" />
-                          <span className="text-sm font-semibold">{cat.title}</span>
-                          <span className="text-[10px] text-gray-500">View articles</span>
-                        </a>
-                      );
-                    })}
+          {/* Main Desktop Navbar START */}
+          <nav className="hidden xl:flex items-center space-x-8">
+            
+            {/* Demos Dropdown */}
+            <div className="relative">
+              <button 
+                onClick={() => toggleDropdown('demos')}
+                className="flex items-center text-sm font-medium hover:text-primary transition-colors gap-1 text-foreground"
+              >
+                Demos <ChevronDown className={`w-3.5 h-3.5 transition-transform ${activeDropdown === 'demos' ? 'rotate-180' : ''}`} />
+              </button>
+              {activeDropdown === 'demos' && (
+                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-3 w-[450px] rounded-2xl glass border border-border overflow-hidden p-6 shadow-2xl animate-fade-in bg-card text-foreground">
+                  <div className="grid grid-cols-2 gap-4 mb-4">
+                    <ul className="space-y-2.5 text-xs font-semibold text-gray-400">
+                      <li><a href="/" className="hover:text-primary transition-colors block">Classic Default</a></li>
+                      <li><a href="#" className="hover:text-primary transition-colors block">Software Company</a></li>
+                      <li><a href="#" className="hover:text-primary transition-colors block">Finance Consulting</a></li>
+                      <li><a href="#" className="hover:text-primary transition-colors block">AI Agency</a></li>
+                      <li><a href="#" className="hover:text-primary transition-colors block">Product Landing</a></li>
+                    </ul>
+                    <ul className="space-y-2.5 text-xs font-semibold text-gray-400">
+                      <li><a href="#" className="hover:text-primary transition-colors block">SaaS</a></li>
+                      <li><a href="#" className="hover:text-primary transition-colors block">SaaS AI Chatbot</a></li>
+                      <li><a href="#" className="hover:text-primary transition-colors block">Application Showcase</a></li>
+                      <li><a href="#" className="hover:text-primary transition-colors block">Personal Portfolio</a></li>
+                      <li><a href="/blog" className="text-primary transition-colors block font-bold">★ Blog Home</a></li>
+                    </ul>
+                  </div>
+                  {/* CTA Box */}
+                  <div className="h-28 rounded-xl bg-gradient-to-r from-primary/10 to-purple-500/20 border border-primary/20 flex flex-col justify-center px-4">
+                    <h6 className="text-xs font-bold text-white mb-1">Looking for custom integration?</h6>
+                    <p className="text-[10px] text-gray-400 mb-2">Our engineers are here to support your tech stack workflow.</p>
                   </div>
                 </div>
-              </div>
-            </nav>
-
-            {/* Action Icons */}
-            <div className="flex items-center space-x-4">
-              <button 
-                onClick={() => setIsSearchOpen(true)}
-                className="p-2 rounded-xl hover:bg-white/5 text-gray-400 hover:text-white transition-colors"
-                aria-label="Open Search"
-              >
-                <Search className="w-5 h-5" />
-              </button>
-
-              <a 
-                href="/blog" 
-                className="hidden md:inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-xl bg-primary text-white hover:bg-orange-600 shadow-lg shadow-orange-500/25 hover:shadow-orange-600/35 transition-all"
-              >
-                Read Blog
-              </a>
-
-              {/* Mobile Menu Button */}
-              <button 
-                onClick={() => setIsOpen(!isOpen)}
-                className="md:hidden p-2 rounded-xl hover:bg-white/5 text-gray-400 hover:text-white transition-colors"
-                aria-label="Toggle Menu"
-              >
-                {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-              </button>
+              )}
             </div>
+
+            {/* Pages Dropdown */}
+            <div className="relative">
+              <button 
+                onClick={() => toggleDropdown('pages')}
+                className="flex items-center text-sm font-medium hover:text-primary transition-colors gap-1 text-foreground"
+              >
+                Pages <ChevronDown className={`w-3.5 h-3.5 transition-transform ${activeDropdown === 'pages' ? 'rotate-180' : ''}`} />
+              </button>
+              {activeDropdown === 'pages' && (
+                <div className="absolute top-full left-0 mt-3 w-56 rounded-xl glass border border-border p-3 shadow-2xl space-y-1.5 animate-fade-in bg-card text-xs text-gray-400 font-semibold">
+                  <a href="#" className="block px-3 py-1.5 rounded-lg hover:bg-white/5 hover:text-white transition-colors">About Us</a>
+                  <a href="/blog" className="block px-3 py-1.5 rounded-lg hover:bg-white/5 hover:text-white transition-colors">Blog Archives</a>
+                  <a href="#" className="block px-3 py-1.5 rounded-lg hover:bg-white/5 hover:text-white transition-colors">Pricing Page</a>
+                  <a href="#" className="block px-3 py-1.5 rounded-lg hover:bg-white/5 hover:text-white transition-colors">Integrations</a>
+                  <a href="#" className="block px-3 py-1.5 rounded-lg hover:bg-white/5 hover:text-white transition-colors">Portfolio</a>
+                  <a href="#" className="block px-3 py-1.5 rounded-lg hover:bg-white/5 hover:text-white transition-colors">Authentication</a>
+                  <a href="/404" className="block px-3 py-1.5 rounded-lg hover:bg-white/5 hover:text-white transition-colors">Error 404</a>
+                </div>
+              )}
+            </div>
+
+            {/* Doc Dropdown */}
+            <div className="relative">
+              <button 
+                onClick={() => toggleDropdown('doc')}
+                className="flex items-center text-sm font-medium hover:text-primary transition-colors gap-1 text-foreground"
+              >
+                Doc <ChevronDown className={`w-3.5 h-3.5 transition-transform ${activeDropdown === 'doc' ? 'rotate-180' : ''}`} />
+              </button>
+              {activeDropdown === 'doc' && (
+                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-3 w-[600px] rounded-2xl glass border border-border p-6 shadow-2xl animate-fade-in bg-card text-foreground">
+                  <div className="grid grid-cols-2 gap-4">
+                    {/* Documentation Card */}
+                    <a href="#" className="flex p-3 rounded-xl hover:bg-white/5 border border-transparent hover:border-white/5 transition-all">
+                      <div className="w-8 h-8 rounded bg-primary/20 text-primary flex items-center justify-center mr-3 flex-shrink-0">
+                        📄
+                      </div>
+                      <div>
+                        <h6 className="text-xs font-bold text-white">Documentation</h6>
+                        <p className="text-[10px] text-gray-500 mt-1">Develop projects with layout instructions.</p>
+                      </div>
+                    </a>
+                    {/* Snippets Card */}
+                    <a href="#" className="flex p-3 rounded-xl hover:bg-white/5 border border-transparent hover:border-white/5 transition-all">
+                      <div className="w-8 h-8 rounded bg-purple-500/20 text-purple-400 flex items-center justify-center mr-3 flex-shrink-0">
+                        ⚡
+                      </div>
+                      <div>
+                        <h6 className="text-xs font-bold text-white">Snippets</h6>
+                        <p className="text-[10px] text-gray-500 mt-1">Development guidelines for building platforms.</p>
+                      </div>
+                    </a>
+                    {/* Changelog Card */}
+                    <a href="#" className="flex p-3 rounded-xl hover:bg-white/5 border border-transparent hover:border-white/5 transition-all">
+                      <div className="w-8 h-8 rounded bg-green-500/20 text-green-400 flex items-center justify-center mr-3 flex-shrink-0">
+                        🎯
+                      </div>
+                      <div>
+                        <h6 className="text-xs font-bold text-white">Changelog</h6>
+                        <p className="text-[10px] text-gray-500 mt-1">Recent updates and release announcements.</p>
+                      </div>
+                    </a>
+                    {/* Playwright Card */}
+                    <a href="#" className="flex p-3 rounded-xl hover:bg-white/5 border border-transparent hover:border-white/5 transition-all">
+                      <div className="w-8 h-8 rounded bg-yellow-500/20 text-yellow-400 flex items-center justify-center mr-3 flex-shrink-0">
+                        🎭
+                      </div>
+                      <div>
+                        <h6 className="text-xs font-bold text-white">Playwright tips</h6>
+                        <p className="text-[10px] text-gray-500 mt-1">Headless browser automation guides.</p>
+                      </div>
+                    </a>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <a href="#" className="text-sm font-medium hover:text-primary transition-colors text-foreground">Contact us</a>
+          </nav>
+          {/* Main Desktop Navbar END */}
+
+          {/* Action buttons Block */}
+          <div className="flex items-center space-x-3 relative z-50">
+            
+            {/* Color Switcher */}
+            <div className="relative">
+              <button 
+                onClick={() => setThemeDropdownOpen(!themeDropdownOpen)}
+                className="p-2.5 rounded-xl hover:bg-white/5 text-gray-400 hover:text-white transition-colors"
+                aria-label="Color Switcher"
+              >
+                {currentTheme === 'light' ? (
+                  <Sun className="w-5 h-5" />
+                ) : currentTheme === 'dark' ? (
+                  <Moon className="w-5 h-5" />
+                ) : (
+                  <Laptop className="w-5 h-5" />
+                )}
+              </button>
+              {themeDropdownOpen && (
+                <div className="absolute right-0 mt-2 w-32 rounded-xl glass border border-border p-2 shadow-xl animate-fade-in bg-card text-xs text-gray-400 font-semibold space-y-1 z-55">
+                  <button 
+                    onClick={() => handleThemeChange('light')}
+                    className={`w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-white/5 hover:text-white transition-colors ${currentTheme === 'light' ? 'text-primary bg-primary/10' : ''}`}
+                  >
+                    <Sun className="w-3.5 h-3.5" /> Light
+                  </button>
+                  <button 
+                    onClick={() => handleThemeChange('dark')}
+                    className={`w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-white/5 hover:text-white transition-colors ${currentTheme === 'dark' ? 'text-primary bg-primary/10' : ''}`}
+                  >
+                    <Moon className="w-3.5 h-3.5" /> Dark
+                  </button>
+                  <button 
+                    onClick={() => handleThemeChange('auto')}
+                    className={`w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-white/5 hover:text-white transition-colors ${currentTheme === 'auto' ? 'text-primary bg-primary/10' : ''}`}
+                  >
+                    <Laptop className="w-3.5 h-3.5" /> Auto
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Sign up */}
+            <a 
+              href="#" 
+              className="hidden sm:inline-flex items-center justify-center px-4 py-2 text-xs font-bold rounded-xl bg-primary text-white hover:bg-opacity-90 shadow-lg shadow-primary/20 transition-all"
+            >
+              Sign up
+            </a>
+
+            {/* Mobile Toggler */}
+            <button 
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="xl:hidden p-2 rounded-xl hover:bg-white/5 text-gray-400 hover:text-white transition-colors"
+              aria-label="Toggle Navigation Menu"
+            >
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
           </div>
         </div>
+      </div>
 
-        {/* Mobile Navigation Drawer */}
-        {isOpen && (
-          <div className="md:hidden glass border-t border-white/5 py-4 px-6 absolute top-full left-0 w-full shadow-2xl flex flex-col space-y-4 animate-fade-in">
-            <a href="/" className="text-base font-semibold hover:text-purple-400 transition-colors" onClick={() => setIsOpen(false)}>Home</a>
-            <a href="/blog" className="text-base font-semibold hover:text-purple-400 transition-colors" onClick={() => setIsOpen(false)}>Articles</a>
-            <div className="border-t border-white/5 pt-3">
-              <p className="text-xs uppercase tracking-wider text-gray-500 font-bold mb-2">Categories</p>
-              <div className="grid grid-cols-2 gap-2">
-                {categories.map(cat => (
-                  <a key={cat.title} href={cat.url} className="p-2 rounded-lg bg-white/5 text-sm font-medium" onClick={() => setIsOpen(false)}>
-                    {cat.title}
-                  </a>
-                ))}
-              </div>
-            </div>
-            <a href="/blog" className="w-full text-center py-2.5 rounded-xl bg-purple-600 text-white text-sm font-bold shadow-lg shadow-purple-600/20" onClick={() => setIsOpen(false)}>
-              Get Started
-            </a>
-          </div>
-        )}
-      </header>
-
-      {/* Render Search Overlay */}
-      <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
-    </>
+      {/* Mobile Menu Drawer */}
+      {mobileMenuOpen && (
+        <div className="xl:hidden glass border-t border-border py-4 px-6 absolute top-full left-0 w-full shadow-2xl flex flex-col space-y-4 animate-fade-in bg-card text-foreground">
+          <a href="#" className="text-sm font-semibold hover:text-primary transition-colors">Demos</a>
+          <a href="#" className="text-sm font-semibold hover:text-primary transition-colors">Pages</a>
+          <a href="#" className="text-sm font-semibold hover:text-primary transition-colors">Doc</a>
+          <a href="#" className="text-sm font-semibold hover:text-primary transition-colors">Contact us</a>
+          <a href="#" className="w-full text-center py-2.5 rounded-xl bg-primary text-white text-xs font-bold shadow-lg shadow-primary/15">
+            Sign up
+          </a>
+        </div>
+      )}
+    </header>
   );
 }
